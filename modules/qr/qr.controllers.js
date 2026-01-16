@@ -1,3 +1,8 @@
+import qrcode from "qrcode";
+
 export const getQR = (req, res) => {
-    // Code to generate and return QR
-}
+  const { data } = req.body;
+  const buffer = qrcode.toBuffer(data);
+  res.type("png");
+  res.status(200).send(buffer);
+};
