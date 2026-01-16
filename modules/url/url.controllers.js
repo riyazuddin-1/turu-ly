@@ -21,3 +21,23 @@ export const generateShortId = async (req, res) => {
     },
   });
 };
+
+export const forwardToUrl = async (req, res) => {
+  const { short } = req.params;
+  const record = await db.findOne({
+    short_id: short
+  }, {
+    projection: {
+      url: 1
+    }
+  });
+
+  if (!record) {
+    res.status(404).send({
+      success: false,
+      message: "Url not found with given id"
+    })
+  }
+
+  res.redirect(301, record.url);
+};
