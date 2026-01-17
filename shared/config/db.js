@@ -11,7 +11,13 @@ client
     console.error(e);
   });
 
-process.on("SIGINT", () => client.close());
-process.on("SIGTERM", () => client.close());
+const shutdown = () => {
+  console.log("\nShutting down the server...\n");
+  client.close();
+  process.exit(0);
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
 
 export default client;

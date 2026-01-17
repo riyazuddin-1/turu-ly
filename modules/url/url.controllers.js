@@ -1,7 +1,7 @@
 import shortId from "shortid";
 import Database from "../../shared/services/db.js";
 
-const db = new Database("vector").collection("short_urls");
+const db = new Database("vector", "short_urls");
 
 export const generateShortId = async (req, res) => {
   const { url } = req.body;

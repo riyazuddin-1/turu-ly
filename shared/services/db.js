@@ -4,7 +4,23 @@ class Database {
   constructor(database, collection) {
     this.client = client;
     this.database = database;
-    this.collection = this.clientclient.db(database).collection(collection);
+    this.collection = this.client.db(database).collection(collection);
+
+    return new Proxy(this, {
+      get(target, prop) {
+        if (prop in target) {
+          return target[prop];
+        }
+
+        let value = target.collection[prop];
+
+        if (typeof value === 'function') {
+          return value.bind(target.collection);
+        }
+
+        return value;
+      }
+    })
   }
 
   async insertOne(payload, options = {}) {
