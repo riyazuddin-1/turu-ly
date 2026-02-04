@@ -1,8 +1,10 @@
-import Database from "../../shared/services/db";
-import Hashing from "../../shared/services/hashing";
-import JWT from "../../shared/services/jwt";
+import { ObjectId } from "mongodb";
+import Database from "../../shared/services/db.js";
+import Hashing from "../../shared/services/hashing.js";
+import JWT from "../../shared/services/jwt.js";
+import { checkUsername } from "../../helpers/username.js";
 
-const Users = await Database("vector", "users");
+const Users = new Database("vector", "users");
 const hashing = new Hashing();
 const jwt = new JWT();
 
@@ -40,6 +42,7 @@ export const loginHandler = async (req, res) => {
   }
 
   const payload = {
+    userid: user._id,
     ...(username ? { username } : { email }),
     ...(user.name
       ? { name: user.name }
@@ -83,6 +86,7 @@ export const signupHandler = async (req, res) => {
   }
 
   delete payload.password;
+  payload.userid = inserted.insertedId;
 
   const token = jwt.create(payload);
 
@@ -94,6 +98,52 @@ export const signupHandler = async (req, res) => {
   });
 };
 
-export const verifyUsername = (req, res) => {};
+export const verifyUsername = async (req, res) => {
+  const { username } = req.body;
+  const { app } = req.params;
 
-export const updateUser = (req, res) => {};
+  const found = await checkUsername(app, username);
+
+  if (found) {
+    return res.status(409).json({
+      success: false,
+      message: "Username already exists",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Username available",
+  });
+};
+
+export const updateUser = async (req, res) => {
+  const payload = req.body;
+  const { userid } = req.user;
+
+  /**
+   * TODO:
+   * Handle email updation, to verify email
+   */
+
+  const updated = await Users.updateOne(
+    {
+      _id: new ObjectId(userid),
+    },
+    {
+      $set: payload,
+    },
+  );
+
+  if (updated.modifiedCount == 0) {
+    return res.status(404).json({
+      success: false,
+      message: "Could not update user",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "User details updated successfully",
+  });
+};

@@ -1,5 +1,11 @@
 import express from "express";
-import { validateLogin, validateSignup } from "./auth.middlewares.js";
+import {
+  validateLogin,
+  validateSignup,
+  validateToken,
+  validateUsername,
+  validateUserUpdate,
+} from "./auth.middlewares.js";
 import {
   loginHandler,
   signupHandler,
@@ -13,9 +19,8 @@ router.post("/login", validateLogin, loginHandler);
 
 router.post("/signup", validateSignup, signupHandler);
 
-// pending
-router.post("/username", verifyUsername);
+router.post("/username", validateUsername, verifyUsername);
 
-router.put("/user", updateUser);
+router.put("/user", validateToken, validateUserUpdate, updateUser);
 
 export default router;

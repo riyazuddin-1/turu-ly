@@ -17,6 +17,6 @@ class JWT {
 export default JWT;
 
 /**
- * Pending:
+ * TODO:
  * Adding secret key for tokens
  */
