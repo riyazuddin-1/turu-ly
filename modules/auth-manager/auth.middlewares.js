@@ -130,3 +130,77 @@ export const validateUserUpdate = async (req, res, next) => {
 
   next();
 };
+
+export const validateForgotPassword = (req, res, next) => {
+  const { app, email } = req.body;
+
+  if (!app) {
+    return res.status(400).json({
+      success: false,
+      message: "App name is required in body",
+    });
+  }
+
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: "Email is required",
+    });
+  }
+
+  next();
+};
+
+export const validateChangePassword = (req, res, next) => {
+  const { app, newPassword, userVerificationId, verificationCode } = req.body;
+
+  if (!app) {
+    return res.status(400).json({
+      success: false,
+      message: "App name is required in body",
+    });
+  }
+
+  if (!newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "New password is required",
+    });
+  }
+
+  if (!userVerificationId || !verificationCode) {
+    return res.status(400).json({
+      success: false,
+      message: "Verification id and code are required",
+    });
+  }
+
+  if (typeof newPassword !== "string" || newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: "New password must be at least 6 characters long",
+    });
+  }
+
+  next();
+};
+
+export const validateVerifyAccount = (req, res, next) => {
+  const { user_verification_id, verification_code, app } = req.query;
+
+  if (!app) {
+    return res.status(400).json({
+      success: false,
+      message: "App name is required in query",
+    });
+  }
+
+  if (!user_verification_id || !verification_code) {
+    return res.status(400).json({
+      success: false,
+      message: "Verification id and code are required",
+    });
+  }
+
+  next();
+};
